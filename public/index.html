@@ -1,31 +1,726 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LAVAZA CAR · Reserva</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f4f8f8;color:#152020;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
-.wrap{max-width:620px;margin:auto;padding:30px 18px}.brand{font-weight:900;letter-spacing:.08em;font-size:23px}.sub{color:#748181;margin:5px 0 25px}.card{background:white;border:1px solid #e2e9e9;border-radius:22px;padding:24px;box-shadow:0 8px 30px #1720200c}
-.progress{font-size:12px;color:#718080;margin-bottom:20px}h1{font-size:25px;margin:0 0 5px}.price{font-size:21px;font-weight:850;margin-bottom:22px}
-label{display:block;font-size:13px;font-weight:800;margin:13px 0 7px}select,input{width:100%;padding:13px;border:1px solid #dce5e5;border-radius:11px;font-size:16px;background:white}
-button{border:0;border-radius:11px;padding:13px 16px;font-weight:800;cursor:pointer}.primary{width:100%;background:#152020;color:#fff;margin-top:20px}.hidden{display:none}
-.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:10px}.calendar button{padding:11px 0;background:#f5f8f8}.calendar button.sel{background:#152020;color:#fff}.calendar button.off{opacity:.3;cursor:not-allowed}
-.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:10px}.slot{background:#edf9f1;color:#168048;border:1px solid #b8e5c7}.slot.busy{background:#fff0f0;color:#a92d2d;border-color:#efb6b6;cursor:not-allowed}
-.notice{padding:12px;background:#f2f7f7;border-radius:11px;font-size:13px;margin-top:15px;line-height:1.4;display:flex;align-items:flex-start;gap:10px}.notice input{width:18px;height:18px;margin:1px 0 0;flex:0 0 auto}
-</style></head><body><div class="wrap"><div class="brand">LAVAZA CAR</div><div class="sub">Reserva de limpieza de tapicería</div><div class="card">
-<div class="progress">1 Centro · 2 Fecha · 3 Hora · 4 Datos · 5 Pago</div>
-<h1>Limpieza de tapicería</h1><div class="price">45 € · 1 hora</div>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:#f4f8f8;
+ color:#152020;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif
+}
+.wrap{max-width:620px;margin:auto;padding:30px 18px}
+.brand{font-weight:900;letter-spacing:.08em;font-size:23px}
+.sub{color:#748181;margin:5px 0 25px}
+.card{
+ background:#fff;
+ border:1px solid #e2e9e9;
+ border-radius:22px;
+ padding:24px;
+ box-shadow:0 8px 30px #1720200c
+}
+.progress{font-size:12px;color:#718080;margin-bottom:20px}
+h1{font-size:25px;margin:0 0 5px}
+.price{font-size:21px;font-weight:850;margin-bottom:22px}
 
-<section id="s1"><label>Centro</label><select id="center"><option value="">Selecciona un centro</option><option value="las_rozas">Las Rozas</option><option value="alcala">Alcalá de Henares</option></select><button class="primary" onclick="go2()">Continuar</button></section>
-<section id="s2" class="hidden"><label>Fecha</label><input id="date" type="date"><button class="primary" onclick="go3()">Ver horarios</button></section>
-<section id="s3" class="hidden"><label>Hora</label><div id="slots" class="slots"></div></section>
-<section id="s4" class="hidden"><label>Nombre</label><input id="name"><label>Teléfono</label><input id="phone" type="tel"><label>Email</label><input id="email" type="email"><label>Matrícula</label><input id="plate"><label class="notice"><input id="terms" type="checkbox"> <span>Acepto la política de privacidad y las condiciones de cancelación.</span></label><button class="primary" onclick="pay()">Pagar 45 € y reservar</button></section>
-</div></div>
+label{
+ display:block;
+ font-size:13px;
+ font-weight:800;
+ margin:13px 0 7px
+}
+
+input{
+ width:100%;
+ padding:13px;
+ border:1px solid #dce5e5;
+ border-radius:11px;
+ font-size:16px;
+ background:white
+}
+
+button{
+ border:0;
+ border-radius:11px;
+ padding:13px 16px;
+ font-weight:800;
+ cursor:pointer
+}
+
+.primary{
+ width:100%;
+ background:#152020;
+ color:#fff;
+ margin-top:20px
+}
+
+.primary:disabled{
+ opacity:.45;
+ cursor:not-allowed
+}
+
+.hidden{display:none}
+
+/* CENTROS */
+.centers{
+ display:grid;
+ gap:10px;
+ margin-top:8px
+}
+
+.center{
+ width:100%;
+ text-align:left;
+ background:#fff;
+ border:1px solid #dce5e5;
+ border-radius:13px;
+ padding:15px 16px;
+ cursor:pointer
+}
+
+.center strong{
+ display:block;
+ font-size:16px;
+ margin-bottom:4px
+}
+
+.center small{
+ display:block;
+ color:#748181;
+ font-size:13px;
+ font-weight:500
+}
+
+.center.selected{
+ border:2px solid #152020;
+ background:#f2f7f7
+}
+
+/* FECHA */
+.date-wrap{
+ position:relative;
+ cursor:pointer
+}
+
+.date-wrap input{
+ cursor:pointer
+}
+
+/* HORARIOS */
+.slots{
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:9px;
+ margin-top:10px
+}
+
+.slot{
+ background:#edf9f1;
+ color:#168048;
+ border:1px solid #b8e5c7
+}
+
+.slot.busy{
+ background:#fff0f0;
+ color:#a92d2d;
+ border-color:#efb6b6;
+ cursor:not-allowed
+}
+
+.slot.selected{
+ background:#152020;
+ color:#fff;
+ border-color:#152020
+}
+
+/* CHECKBOX */
+.terms{
+ display:flex;
+ align-items:flex-start;
+ gap:10px;
+ padding:14px;
+ background:#f2f7f7;
+ border-radius:11px;
+ font-size:13px;
+ line-height:1.4;
+ margin-top:18px
+}
+
+.terms input{
+ width:18px;
+ height:18px;
+ margin:1px 0 0;
+ flex:0 0 auto;
+ cursor:pointer
+}
+
+.terms-text{
+ font-weight:500
+}
+
+.terms a{
+ color:#152020;
+ text-decoration:underline;
+ font-weight:700
+}
+
+/* MODAL */
+.modal{
+ position:fixed;
+ inset:0;
+ background:rgba(0,0,0,.55);
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ padding:18px;
+ z-index:1000
+}
+
+.modal.hidden{display:none}
+
+.modal-box{
+ background:#fff;
+ width:min(620px,100%);
+ max-height:85vh;
+ overflow:auto;
+ border-radius:18px;
+ padding:24px;
+ box-shadow:0 20px 60px rgba(0,0,0,.2)
+}
+
+.modal-box h2{
+ margin-top:0
+}
+
+.modal-box p{
+ font-size:14px;
+ line-height:1.55
+}
+
+.close{
+ width:100%;
+ background:#152020;
+ color:#fff;
+ margin-top:15px
+}
+
+.back{
+ background:#eef3f3;
+ color:#152020;
+ margin-top:10px;
+ width:100%
+}
+
+.error{
+ color:#a92d2d;
+ font-size:13px;
+ margin-top:10px;
+ display:none
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<div class="brand">LAVAZA CAR</div>
+<div class="sub">Reserva de limpieza de tapicería</div>
+
+<div class="card">
+
+<div class="progress">
+1 Centro · 2 Fecha · 3 Hora · 4 Datos · 5 Pago
+</div>
+
+<h1>Limpieza de tapicería</h1>
+<div class="price">45 € · 1 hora</div>
+
+
+<!-- CENTRO -->
+
+<section id="s1">
+
+<label>Selecciona tu centro</label>
+
+<div class="centers">
+
+<button type="button" class="center" onclick="selectCenter('las_rozas',this)">
+<strong>Las Rozas</strong>
+<small>Camino de las Ceudas 6</small>
+</button>
+
+<button type="button" class="center" onclick="selectCenter('alcala',this)">
+<strong>Alcalá de Henares</strong>
+<small>Calle Tamajón 2</small>
+</button>
+
+</div>
+
+<button id="continueCenter" class="primary" onclick="go2()" disabled>
+Continuar
+</button>
+
+</section>
+
+
+<!-- FECHA -->
+
+<section id="s2" class="hidden">
+
+<label>Selecciona la fecha</label>
+
+<div class="date-wrap" onclick="openCalendar()">
+<input id="date" type="date" onclick="openCalendar()" onfocus="openCalendar()">
+</div>
+
+<button class="primary" onclick="go3()">
+Ver horarios
+</button>
+
+<button class="back" onclick="show(1)">
+Volver
+</button>
+
+</section>
+
+
+<!-- HORA -->
+
+<section id="s3" class="hidden">
+
+<label>Selecciona una hora</label>
+
+<div id="slots" class="slots"></div>
+
+<button class="back" onclick="show(2)">
+Volver
+</button>
+
+</section>
+
+
+<!-- DATOS -->
+
+<section id="s4" class="hidden">
+
+<label>Nombre</label>
+<input id="name" autocomplete="name">
+
+<label>Teléfono</label>
+<input id="phone" type="tel" autocomplete="tel">
+
+<label>Email</label>
+<input id="email" type="email" autocomplete="email">
+
+<label>Matrícula</label>
+<input id="plate" autocomplete="off">
+
+
+<div class="terms">
+
+<input id="terms" type="checkbox">
+
+<div class="terms-text">
+Acepto la
+<a href="#" onclick="openModal('privacy');return false">
+política de privacidad
+</a>
+y las
+<a href="#" onclick="openModal('cancel');return false">
+condiciones de cancelación
+</a>.
+</div>
+
+</div>
+
+<div id="error" class="error"></div>
+
+<button id="payButton" class="primary" onclick="pay()">
+Pagar 45 € y reservar
+</button>
+
+<button class="back" onclick="show(3)">
+Volver
+</button>
+
+</section>
+
+</div>
+</div>
+
+
+<!-- MODAL PRIVACIDAD -->
+
+<div id="privacy" class="modal hidden" onclick="closeModal(event,'privacy')">
+
+<div class="modal-box" onclick="event.stopPropagation()">
+
+<h2>Política de privacidad</h2>
+
+<p>
+<strong>Responsable:</strong> LAVAZA CAR ALCALÁ DE HENARES, S.L.,
+CIF B75897876, con domicilio legal en Autovía A2 km 34
+Madrid-Barcelona, 28805 Alcalá de Henares (Madrid).
+</p>
+
+<p>
+Los datos facilitados durante la reserva se utilizan para gestionar
+la cita solicitada, procesar el pago, prestar el servicio y enviar
+las comunicaciones relacionadas con la reserva.
+</p>
+
+<p>
+Los datos tratados pueden incluir nombre, teléfono, correo electrónico,
+matrícula del vehículo, centro, fecha y hora de la reserva y datos
+relacionados con el pago.
+</p>
+
+<p>
+Los datos de pago se procesan a través de Stripe. LAVAZA CAR no
+almacena los datos completos de la tarjeta utilizados para realizar
+el pago.
+</p>
+
+<p>
+Los datos se conservarán durante el tiempo necesario para gestionar
+la relación contractual y cumplir las obligaciones legales aplicables.
+</p>
+
+<p>
+La persona interesada puede ejercer los derechos que reconoce la
+normativa de protección de datos, incluidos los derechos de acceso,
+rectificación, supresión, oposición, limitación y portabilidad,
+cuando correspondan.
+</p>
+
+<p>
+La información facilitada se utilizará únicamente para las finalidades
+relacionadas con la reserva y la prestación del servicio, salvo que
+exista una obligación legal que requiera otro tratamiento.
+</p>
+
+<button class="close" onclick="closeModal(null,'privacy')">
+Cerrar
+</button>
+
+</div>
+</div>
+
+
+<!-- MODAL CANCELACIÓN -->
+
+<div id="cancel" class="modal hidden" onclick="closeModal(event,'cancel')">
+
+<div class="modal-box" onclick="event.stopPropagation()">
+
+<h2>Condiciones de cancelación</h2>
+
+<p>
+El importe de gestión de la reserva, de <strong>20 €</strong>,
+no es reembolsable.
+</p>
+
+<p>
+Si la cancelación se realiza con más de <strong>24 horas</strong>
+de antelación, se devolverá el importe abonado menos los 20 €
+correspondientes a la gestión de la reserva.
+</p>
+
+<p>
+Si la cancelación se realiza con menos de 24 horas de antelación,
+no se realizará reembolso.
+</p>
+
+<p>
+Se permite <strong>un cambio de fecha</strong> por reserva.
+El cambio deberá solicitarse con al menos <strong>2 horas</strong>
+de antelación respecto de la cita original.
+</p>
+
+<p>
+Las reservas pueden realizarse con una antelación máxima de
+<strong>14 días</strong>.
+</p>
+
+<button class="close" onclick="closeModal(null,'cancel')">
+Cerrar
+</button>
+
+</div>
+</div>
+
+
 <script>
-let selected="";
-const $=id=>document.getElementById(id);
-function show(n){for(let i=1;i<=4;i++)$("s"+i).classList.toggle("hidden",i!==n)}
-function go2(){if($("center").value)show(2)}
-function go3(){const d=$("date").value;if(!d)return;load();show(3)}
-async function load(){const d=$("date").value;const r=await fetch(`/api/availability?center=${$("center").value}&date=${d}`);const data=await r.json();$("slots").innerHTML="";data.forEach(x=>{const b=document.createElement("button");b.className="slot"+(x.status==="busy"?" busy":"");b.textContent=x.time;b.disabled=x.status==="busy";b.onclick=()=>{selected=x.time;show(4)};$("slots").appendChild(b)})}
-async function pay(){const data={center:$("center").value,date:$("date").value,time:selected,name:$("name").value,phone:$("phone").value,email:$("email").value,plate:$("plate").value};if(Object.values(data).some(v=>!v))return alert("Completa todos los datos.");if(!$("terms").checked)return alert("Debes aceptar la política de privacidad y las condiciones de cancelación.");const r=await fetch("/api/create-checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});const j=await r.json();if(j.url)location.href=j.url;else alert(j.error||"No se pudo iniciar el pago.")}
 
-const d=new Date();d.setDate(d.getDate()+1);$("date").min=d.toISOString().slice(0,10);
-</script></body></html>
+let selected="";
+let selectedCenter="";
+
+const $=id=>document.getElementById(id);
+
+
+/* CAMBIO DE PANTALLA */
+
+function show(n){
+
+for(let i=1;i<=4;i++){
+
+$("s"+i).classList.toggle("hidden",i!==n);
+
+}
+
+}
+
+
+/* CENTRO */
+
+function selectCenter(center,button){
+
+selectedCenter=center;
+
+document.querySelectorAll(".center").forEach(b=>{
+b.classList.remove("selected");
+});
+
+button.classList.add("selected");
+
+$("continueCenter").disabled=false;
+
+}
+
+
+function go2(){
+
+if(!selectedCenter)return;
+
+show(2);
+
+}
+
+
+/* CALENDARIO */
+
+function openCalendar(){
+
+const input=$("date");
+
+if(input.showPicker){
+
+try{
+input.showPicker();
+}catch(e){}
+
+}
+
+}
+
+
+/* FECHA */
+
+function go3(){
+
+const d=$("date").value;
+
+if(!d){
+
+alert("Selecciona una fecha.");
+
+return;
+
+}
+
+load();
+
+show(3);
+
+}
+
+
+/* HORARIOS */
+
+async function load(){
+
+const d=$("date").value;
+
+const r=await fetch(
+`/api/availability?center=${selectedCenter}&date=${d}`
+);
+
+if(!r.ok){
+
+alert("No se han podido consultar los horarios.");
+
+return;
+
+}
+
+const data=await r.json();
+
+$("slots").innerHTML="";
+
+data.forEach(x=>{
+
+const b=document.createElement("button");
+
+b.type="button";
+
+b.className="slot"+(x.status==="busy"?" busy":"");
+
+b.textContent=x.time;
+
+b.disabled=x.status==="busy";
+
+if(x.status!=="busy"){
+
+b.onclick=()=>{
+
+selected=x.time;
+
+document.querySelectorAll(".slot").forEach(s=>{
+s.classList.remove("selected");
+});
+
+b.classList.add("selected");
+
+show(4);
+
+};
+
+}
+
+$("slots").appendChild(b);
+
+});
+
+}
+
+
+/* PAGO */
+
+async function pay(){
+
+const error=$("error");
+
+error.style.display="none";
+
+const data={
+
+center:selectedCenter,
+
+date:$("date").value,
+
+time:selected,
+
+name:$("name").value.trim(),
+
+phone:$("phone").value.trim(),
+
+email:$("email").value.trim(),
+
+plate:$("plate").value.trim()
+
+};
+
+
+if(Object.values(data).some(v=>!v)){
+
+error.textContent="Completa todos los datos antes de continuar.";
+
+error.style.display="block";
+
+return;
+
+}
+
+
+if(!$("terms").checked){
+
+error.textContent="Debes aceptar la política de privacidad y las condiciones de cancelación.";
+
+error.style.display="block";
+
+return;
+
+}
+
+
+$("payButton").disabled=true;
+
+$("payButton").textContent="Preparando pago...";
+
+
+try{
+
+const r=await fetch("/api/create-checkout",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify(data)
+
+});
+
+
+const j=await r.json();
+
+if(j.url){
+
+location.href=j.url;
+
+}else{
+
+throw new Error(j.error||"No se pudo iniciar el pago.");
+
+}
+
+}catch(e){
+
+error.textContent=e.message||"No se pudo iniciar el pago.";
+
+error.style.display="block";
+
+$("payButton").disabled=false;
+
+$("payButton").textContent="Pagar 45 € y reservar";
+
+}
+
+}
+
+
+/* MODALES */
+
+function openModal(id){
+
+$(id).classList.remove("hidden");
+
+}
+
+function closeModal(event,id){
+
+if(event && event.target!==$(id))return;
+
+$(id).classList.add("hidden");
+
+}
+
+
+/* FECHA MÍNIMA */
+
+const d=new Date();
+
+d.setDate(d.getDate()+1);
+
+$("date").min=d.toISOString().slice(0,10);
+
+</script>
+
+</body>
+</html>
