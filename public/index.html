@@ -1,0 +1,31 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LAVAZA CAR · Reserva</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f8f8;color:#152020;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+.wrap{max-width:620px;margin:auto;padding:30px 18px}.brand{font-weight:900;letter-spacing:.08em;font-size:23px}.sub{color:#748181;margin:5px 0 25px}.card{background:white;border:1px solid #e2e9e9;border-radius:22px;padding:24px;box-shadow:0 8px 30px #1720200c}
+.progress{font-size:12px;color:#718080;margin-bottom:20px}h1{font-size:25px;margin:0 0 5px}.price{font-size:21px;font-weight:850;margin-bottom:22px}
+label{display:block;font-size:13px;font-weight:800;margin:13px 0 7px}select,input{width:100%;padding:13px;border:1px solid #dce5e5;border-radius:11px;font-size:16px;background:white}
+button{border:0;border-radius:11px;padding:13px 16px;font-weight:800;cursor:pointer}.primary{width:100%;background:#152020;color:#fff;margin-top:20px}.hidden{display:none}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:10px}.calendar button{padding:11px 0;background:#f5f8f8}.calendar button.sel{background:#152020;color:#fff}.calendar button.off{opacity:.3;cursor:not-allowed}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:10px}.slot{background:#edf9f1;color:#168048;border:1px solid #b8e5c7}.slot.busy{background:#fff0f0;color:#a92d2d;border-color:#efb6b6;cursor:not-allowed}
+.notice{padding:12px;background:#f2f7f7;border-radius:11px;font-size:13px;margin-top:15px;line-height:1.4}
+</style></head><body><div class="wrap"><div class="brand">LAVAZA CAR</div><div class="sub">Reserva de limpieza de tapicería</div><div class="card">
+<div class="progress">1 Centro · 2 Fecha · 3 Hora · 4 Datos · 5 Pago</div>
+<h1>Limpieza de tapicería</h1><div class="price">45 € · 1 hora</div>
+
+<section id="s1"><label>Centro</label><select id="center"><option value="">Selecciona un centro</option><option value="las_rozas">Las Rozas</option><option value="alcala">Alcalá de Henares</option></select><button class="primary" onclick="go2()">Continuar</button></section>
+<section id="s2" class="hidden"><label>Fecha</label><input id="date" type="date"><button class="primary" onclick="go3()">Ver horarios</button></section>
+<section id="s3" class="hidden"><label>Hora</label><div id="slots" class="slots"></div></section>
+<section id="s4" class="hidden"><label>Nombre</label><input id="name"><label>Teléfono</label><input id="phone" type="tel"><label>Email</label><input id="email" type="email"><label>Matrícula</label><input id="plate"><div class="notice">Acepto la política de privacidad y las condiciones de cancelación.</div><button class="primary" onclick="pay()">Pagar 45 € y reservar</button></section>
+</div></div>
+<script>
+let selected="";
+const $=id=>document.getElementById(id);
+function show(n){for(let i=1;i<=4;i++)$("s"+i).classList.toggle("hidden",i!==n)}
+function go2(){if($("center").value)show(2)}
+function go3(){const d=$("date").value;if(!d)return;load();show(3)}
+async function load(){const d=$("date").value;const r=await fetch(`/api/availability?center=${$("center").value}&date=${d}`);const data=await r.json();$("slots").innerHTML="";data.forEach(x=>{const b=document.createElement("button");b.className="slot"+(x.status==="busy"?" busy":"");b.textContent=x.time;b.disabled=x.status==="busy";b.onclick=()=>{selected=x.time;show(4)};$("slots").appendChild(b)})}
+async function pay(){const data={center:$("center").value,date:$("date").value,time:selected,name:$("name").value,phone:$("phone").value,email:$("email").value,plate:$("plate").value};if(Object.values(data).some(v=>!v))return alert("Completa todos los datos.");const r=await fetch("/api/create-checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});const j=await r.json();if(j.url)location.href=j.url;else alert(j.error||"No se pudo iniciar el pago.")}
+
+const d=new Date();d.setDate(d.getDate()+1);$("date").min=d.toISOString().slice(0,10);
+</script></body></html>
