@@ -91,7 +91,7 @@ app.get("/api/availability",(req,res)=>{
   }));
 });
 
-app.post("/api/create-checkout",async(req,res)=>{
+app.post("/api/create-checkout",express.json(),async(req,res)=>{
   const {center,date,time,name,phone,email,plate}=req.body;
   if(!center||!date||!time||!name||!phone||!email||!plate)
     return res.status(400).json({error:"Faltan datos."});
