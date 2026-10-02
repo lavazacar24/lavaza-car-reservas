@@ -125,7 +125,7 @@ app.post("/api/webhook",express.raw({type:"application/json"}),(req,res)=>{
   if(!stripe||!process.env.STRIPE_WEBHOOK_SECRET)return res.sendStatus(200);
   let event;
   try{event=stripe.webhooks.constructEvent(req.body,req.headers["stripe-signature"],process.env.STRIPE_WEBHOOK_SECRET)}
-  catch(e){return res.status(400).send("Webhook error")}
+  catch(e){console.error("Webhook error:",e.message);return res.status(400).send("Webhook error")}
   if(event.type==="checkout.session.completed"){
     const s=event.data.object,m=s.metadata;
     reservations.set(m.key,{...m,payment:"paid",stripe_session:s.id});
